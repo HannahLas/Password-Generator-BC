@@ -88,69 +88,97 @@ var upperCasedCharacters = [
   "Z",
 ];
 
-let userObject = {};
-
 // Function to prompt user for password options
 function getPasswordOptions() {
-  let userInput = prompt(
+  let passwordCriteria = {
+    length: 0,
+    characterBase: [],
+  };
+  let lengthInput = prompt(
     "Hello! How many characters would you like your password to contain?"
   );
-  userObject.data = userInput;
-  console.log(userInput);
-
-  if (userInput < 8 || userInput > 128) {
+  if (lengthInput < 8 || lengthInput > 128) {
     alert(
       "Please make sure that the number is between 9 and 128 characters. Click on Generate Password again."
     );
     return;
-  } else if (isNaN(userInput)) {
+  } else if (isNaN(lengthInput)) {
     alert("Please enter a number. Click on Generate Password again.");
     return;
   } else {
-    userObject.data = userInput;
+    passwordCriteria.length = lengthInput;
   }
 
-  confirm("Would you like your password to contain lowercase letters?");
-  confirm("Would you like your password to contain uppercase letters");
-  confirm("Would you like your password to contain numbers?");
-  confirm("Would you like your password to contain special characters?");
+  var userWantsLowercase = confirm(
+    "Would you like your password to contain lowercase letters?"
+  );
+  if (userWantsLowercase === true) {
+    passwordCriteria.characterBase =
+      passwordCriteria.characterBase.concat(lowerCasedCharacters);
+  }
+
+  var userWantsUppercase = confirm(
+    "Would you like your password to contain uppercase letters?"
+  );
+
+  if (userWantsUppercase === true) {
+    passwordCriteria.characterBase =
+      passwordCriteria.characterBase.concat(upperCasedCharacters);
+  }
+  var userWantsNumbers = confirm(
+    "Would you like your password to contain numbers?"
+  );
+
+  if (userWantsNumbers === true) {
+    passwordCriteria.characterBase =
+      passwordCriteria.characterBase.concat(numericCharacters);
+  }
+
+  var userWantsSpecialCharacters = confirm(
+    "Would you like your password to contain special characters?"
+  );
+
+  if (userWantsSpecialCharacters === true) {
+    passwordCriteria.characterBase =
+      passwordCriteria.characterBase.concat(specialCharacters);
+  }
+
+  //Checks that the user has selected at least one type of character
+
+  if (
+    userWantsLowercase === false &&
+    userWantsNumbers === false &&
+    userWantsSpecialCharacters === false &&
+    userWantsUppercase === false
+  ) {
+    alert(
+      "You must select at least one type of character. Please click on the Generate Password button again"
+    );
+    return;
+  }
+
+  return passwordCriteria;
 }
-
-// var arrays = [
-//   specialCharacters,
-//   numericCharacters,
-//   lowerCasedCharacters,
-//   upperCasedCharacters,
-// ];
-
 // Function for getting a random element from an array
-//THE PROBLEM with this is that it only selects one element.
 function getRandom(arr) {
   var randomIndex = Math.floor(Math.random() * arr.length);
   return arr[randomIndex];
 }
-function getRandom(arr, numberOfElements) {
-  var randomElements = [];
-  for (let i = 0; i < numberOfElements; i++) {
-    var randomElement = getRandom(arr);
-    randomElements.push(randomElement);
-  }
-  return randomElements;
-}
-
-var numberOfRandomElements = 3;
-var randomElements = getRandom(specialCharacters, numberOfRandomElements);
-console.log(randomElements);
-
-// // Checking if it works
-// const randomSpecialCharacter = getRandom(specialCharacters);
-// console.log(randomSpecialCharacter);
-// const randomNumber = getRandom(numericCharacters);
-// console.log(randomNumber);
 
 // Function to generate password with user input
 function generatePassword() {
-  var pwOpts = getPasswordOptions();
+  var passwordCriteria = getPasswordOptions();
+  if (passwordCriteria === undefined) {
+    return "Invalid password options!";
+  }
+  var userPassword = "";
+  for (var i = 0; i < passwordCriteria.length; i++) {
+    var randomIndex = Math.floor(
+      Math.random() * passwordCriteria.characterBase.length
+    );
+    userPassword += passwordCriteria.characterBase[randomIndex];
+  }
+  return userPassword;
 }
 
 // Get references to the #generate element
@@ -158,10 +186,10 @@ var generateBtn = document.querySelector("#generate");
 
 // Write password to the #password input
 function writePassword() {
-  var password = generatePassword();
+  var userPassword = generatePassword();
   var passwordText = document.querySelector("#password");
 
-  passwordText.value = password;
+  passwordText.value = userPassword;
 }
 
 // Add event listener to generate button
